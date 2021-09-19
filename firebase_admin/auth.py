@@ -220,7 +220,7 @@ def verify_id_token(id_token, app=None, check_revoked=False):
     return client.verify_id_token(id_token, check_revoked=check_revoked)
 
 
-def create_session_cookie(id_token, expires_in, app=None):
+def create_session_cookie(id_token, expires_in, app=None, tenant_id=None):
     """Creates a new Firebase session cookie from the given ID token and options.
 
     The returned JWT can be set as a server-side session cookie with a custom cookie policy.
@@ -240,7 +240,7 @@ def create_session_cookie(id_token, expires_in, app=None):
     """
     client = _get_client(app)
     # pylint: disable=protected-access
-    return client._token_generator.create_session_cookie(id_token, expires_in)
+    return client._token_generator.create_session_cookie(id_token, expires_in, tenant_id=tenant_id)
 
 
 def verify_session_cookie(session_cookie, check_revoked=False, app=None):

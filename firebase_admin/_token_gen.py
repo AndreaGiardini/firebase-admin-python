@@ -206,7 +206,7 @@ class TokenGenerator:
             raise TokenSignError(msg, error)
 
 
-    def create_session_cookie(self, id_token, expires_in):
+    def create_session_cookie(self, id_token, expires_in, tenant_id=None):
         """Creates a session cookie from the provided ID token."""
         id_token = id_token.decode('utf-8') if isinstance(id_token, bytes) else id_token
         if not isinstance(id_token, str) or not id_token:
@@ -225,11 +225,16 @@ class TokenGenerator:
             raise ValueError('Illegal expiry duration: {0}. Duration must be at most {1} '
                              'seconds.'.format(expires_in, MAX_SESSION_COOKIE_DURATION_SECONDS))
 
-        url = '{0}:createSessionCookie'.format(self.base_url)
+        if tenant_id:
+            url = '{0}/tenants/{1}:createSessionCookie'.format(self.base_url, tenant_id)
+        else:
+            url = '{0}:createSessionCookie'.format(self.base_url)
+
         payload = {
             'idToken': id_token,
             'validDuration': expires_in,
         }
+
         try:
             body, http_resp = self.http_client.body_and_response('post', url, json=payload)
         except requests.exceptions.RequestException as error:
